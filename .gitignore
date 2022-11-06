@@ -1,1 +1,7 @@
 creditcard.csv
+
+*.pyc
+
+.vscode
+
+notebooks/testing.ipynb
