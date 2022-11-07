@@ -1,13 +1,11 @@
-import numpy as np
 import pandas as pd
-
-from sklearn.metrics import f1_score, make_scorer
-from sklearn.model_selection import train_test_split, cross_validate
-
-from skopt import BayesSearchCV
-from skopt.space import Real, Integer, Categorical
-
 from lightgbm import LGBMClassifier
+from sklearn.metrics import f1_score, make_scorer
+from sklearn.model_selection import cross_validate, train_test_split
+from skopt import BayesSearchCV
+from skopt.space import Categorical, Integer, Real
+
+from src.imblearn_utils import smoteenn
 
 
 def load_dataframe():
@@ -44,8 +42,8 @@ def search_parameters(x_train, y_train):
         model,
         {
             "boosting_type": Categorical(["gbdt", "dart"]),
-            "learning_rate": Real(1e-6, 0.3, prior="log-uniform"),
-            "num_leaves": Integer(1, 32),
+            "learning_rate": Real(1e-3, 0.3, prior="log-uniform"),
+            "num_leaves": Integer(6, 32),
             "n_estimators": Integer(100, 300),
             "min_split_gain": Real(0, 1),
             "reg_alpha": Real(1e-6, 10, prior="log-uniform"),
@@ -78,9 +76,13 @@ def search_parameters(x_train, y_train):
     return results, best_params
 
 
-def main():
+def lightGBM(resample=None):
     x_train, x_test, y_train, y_test = load_dataframe()
 
+    if resample == "SMOTEENN":
+        print("Applying resampling technique...")
+        x_train, y_train = smoteenn(x_train, y_train)
+    print("Starting to search for optimal params...")
     results, best_params = search_parameters(x_train, y_train)
 
     # fit model using best params
@@ -94,4 +96,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    lightGBM()
