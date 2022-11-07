@@ -4,4 +4,5 @@ creditcard.csv
 
 .vscode
 
+*.ipynb_checkpoints
 notebooks/testing.ipynb
